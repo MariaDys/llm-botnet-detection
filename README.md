@@ -7,6 +7,9 @@ DeepSeek V4/R1: сильная в коде, сильнее на английск
 
 GigaChat: русскоязычная модель – русский промпт
 
+## датасет 
+https://www.kaggle.com/datasets/mkashifn/nbaiot-dataset
+
 ## ручные методы
 
 
