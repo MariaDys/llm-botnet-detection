@@ -1,6 +1,3 @@
-# codex для мета промпта
-
-
 
 # llm-botnet-detection
 
@@ -13,11 +10,11 @@ DeepSeek V4/R1
 GigaChat
 русскоязычная модель – русский промпт
 
-# ручные методы
+## ручные методы
 
 
 
-# прогоны -- вывод сохраняем в папку results 
+## прогоны -- вывод сохраняем в папку results 
 сначала установить requirements.txt через `pip3 install -r requirements.txt`
 
 python3 claude_en.py --data_dir ../dataset --device_id 1 2>&1 | tee ../results/claude_en.txt
@@ -29,3 +26,6 @@ python3 deepseek_ru.py --data_dir ../dataset --device_id 1 2>&1 | tee ../results
 
 python3 gigachat_en.py --data_dir ../dataset --device_id 1 2>&1 | tee ../results/gigachat_en.txt
 python3 gigachat_ru.py --data_dir ../dataset --device_id 1 2>&1 | tee ../results/gigachat_ru.txt
+
+
+## codex для мета промпта
