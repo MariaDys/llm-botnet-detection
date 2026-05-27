@@ -27,5 +27,11 @@ python3 deepseek_ru.py --data_dir ../dataset --device_id 1 2>&1 | tee ../results
 python3 gigachat_en.py --data_dir ../dataset --device_id 1 2>&1 | tee ../results/gigachat_en.txt
 python3 gigachat_ru.py --data_dir ../dataset --device_id 1 2>&1 | tee ../results/gigachat_ru.txt
 
+## скрипт для прогона 6 скриптов по всем 9 девайсам с сохранением результатов в папки
+
+run_all.sh
+
+`chmod +x run_all.sh`
+`./run_all.sh`
 
 ## codex для мета промпта
