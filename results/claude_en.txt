@@ -1,0 +1,348 @@
+============================================================
+  IoT Botnet Detector  –  Deep Autoencoder (N-BaIoT)
+============================================================
+
+[1/6] Loading data for device '1' …
+  Loading benign traffic  : ../dataset/1.benign.csv
+    → 49,548 samples, 115 features
+  Loading attack traffic  : 1.gafgyt.combo.csv                                  →   59,718 samples  [gafgyt.combo]
+  Loading attack traffic  : 1.gafgyt.junk.csv                                   →   29,068 samples  [gafgyt.junk]
+  Loading attack traffic  : 1.gafgyt.scan.csv                                   →   29,849 samples  [gafgyt.scan]
+  Loading attack traffic  : 1.gafgyt.tcp.csv                                    →   92,141 samples  [gafgyt.tcp]
+  Loading attack traffic  : 1.gafgyt.udp.csv                                    →  105,874 samples  [gafgyt.udp]
+  Loading attack traffic  : 1.mirai.ack.csv                                     →  102,195 samples  [mirai.ack]
+  Loading attack traffic  : 1.mirai.scan.csv                                    →  107,685 samples  [mirai.scan]
+  Loading attack traffic  : 1.mirai.syn.csv                                     →  122,573 samples  [mirai.syn]
+  Loading attack traffic  : 1.mirai.udp.csv                                     →  237,665 samples  [mirai.udp]
+  Loading attack traffic  : 1.mirai.udpplain.csv                                →   81,982 samples  [mirai.udpplain]
+
+[2/6] Preprocessing …
+
+  Train (benign)    :    26,425 samples
+  Validation (benign):     6,607 samples
+  Test  (benign)    :    16,516 samples
+  Test  (attack)    :   968,750 samples
+  Test  (total)     :   985,266 samples
+
+[3/6] Building autoencoder …
+Model: "DeepAutoencoder"
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━┓
+┃ Layer (type)                         ┃ Output Shape                ┃         Param # ┃
+┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━┩
+│ input (InputLayer)                   │ (None, 115)                 │               0 │
+├──────────────────────────────────────┼─────────────────────────────┼─────────────────┤
+│ enc_dense_0 (Dense)                  │ (None, 115)                 │          13,340 │
+├──────────────────────────────────────┼─────────────────────────────┼─────────────────┤
+│ enc_bn_0 (BatchNormalization)        │ (None, 115)                 │             460 │
+├──────────────────────────────────────┼─────────────────────────────┼─────────────────┤
+│ enc_act_0 (LeakyReLU)                │ (None, 115)                 │               0 │
+├──────────────────────────────────────┼─────────────────────────────┼─────────────────┤
+│ enc_dense_1 (Dense)                  │ (None, 86)                  │           9,976 │
+├──────────────────────────────────────┼─────────────────────────────┼─────────────────┤
+│ enc_bn_1 (BatchNormalization)        │ (None, 86)                  │             344 │
+├──────────────────────────────────────┼─────────────────────────────┼─────────────────┤
+│ enc_act_1 (LeakyReLU)                │ (None, 86)                  │               0 │
+├──────────────────────────────────────┼─────────────────────────────┼─────────────────┤
+│ enc_dense_2 (Dense)                  │ (None, 57)                  │           4,959 │
+├──────────────────────────────────────┼─────────────────────────────┼─────────────────┤
+│ enc_bn_2 (BatchNormalization)        │ (None, 57)                  │             228 │
+├──────────────────────────────────────┼─────────────────────────────┼─────────────────┤
+│ enc_act_2 (LeakyReLU)                │ (None, 57)                  │               0 │
+├──────────────────────────────────────┼─────────────────────────────┼─────────────────┤
+│ enc_dense_3 (Dense)                  │ (None, 37)                  │           2,146 │
+├──────────────────────────────────────┼─────────────────────────────┼─────────────────┤
+│ enc_bn_3 (BatchNormalization)        │ (None, 37)                  │             148 │
+├──────────────────────────────────────┼─────────────────────────────┼─────────────────┤
+│ enc_act_3 (LeakyReLU)                │ (None, 37)                  │               0 │
+├──────────────────────────────────────┼─────────────────────────────┼─────────────────┤
+│ bottleneck (Dense)                   │ (None, 28)                  │           1,064 │
+├──────────────────────────────────────┼─────────────────────────────┼─────────────────┤
+│ bottleneck_bn (BatchNormalization)   │ (None, 28)                  │             112 │
+├──────────────────────────────────────┼─────────────────────────────┼─────────────────┤
+│ bottleneck_act (LeakyReLU)           │ (None, 28)                  │               0 │
+├──────────────────────────────────────┼─────────────────────────────┼─────────────────┤
+│ dec_dense_0 (Dense)                  │ (None, 37)                  │           1,073 │
+├──────────────────────────────────────┼─────────────────────────────┼─────────────────┤
+│ dec_bn_0 (BatchNormalization)        │ (None, 37)                  │             148 │
+├──────────────────────────────────────┼─────────────────────────────┼─────────────────┤
+│ dec_act_0 (LeakyReLU)                │ (None, 37)                  │               0 │
+├──────────────────────────────────────┼─────────────────────────────┼─────────────────┤
+│ dec_dense_1 (Dense)                  │ (None, 57)                  │           2,166 │
+├──────────────────────────────────────┼─────────────────────────────┼─────────────────┤
+│ dec_bn_1 (BatchNormalization)        │ (None, 57)                  │             228 │
+├──────────────────────────────────────┼─────────────────────────────┼─────────────────┤
+│ dec_act_1 (LeakyReLU)                │ (None, 57)                  │               0 │
+├──────────────────────────────────────┼─────────────────────────────┼─────────────────┤
+│ dec_dense_2 (Dense)                  │ (None, 86)                  │           4,988 │
+├──────────────────────────────────────┼─────────────────────────────┼─────────────────┤
+│ dec_bn_2 (BatchNormalization)        │ (None, 86)                  │             344 │
+├──────────────────────────────────────┼─────────────────────────────┼─────────────────┤
+│ dec_act_2 (LeakyReLU)                │ (None, 86)                  │               0 │
+├──────────────────────────────────────┼─────────────────────────────┼─────────────────┤
+│ dec_dense_3 (Dense)                  │ (None, 115)                 │          10,005 │
+├──────────────────────────────────────┼─────────────────────────────┼─────────────────┤
+│ dec_bn_3 (BatchNormalization)        │ (None, 115)                 │             460 │
+├──────────────────────────────────────┼─────────────────────────────┼─────────────────┤
+│ dec_act_3 (LeakyReLU)                │ (None, 115)                 │               0 │
+├──────────────────────────────────────┼─────────────────────────────┼─────────────────┤
+│ output (Dense)                       │ (None, 115)                 │          13,340 │
+└──────────────────────────────────────┴─────────────────────────────┴─────────────────┘
+ Total params: 65,529 (255.97 KB)
+ Trainable params: 64,293 (251.14 KB)
+ Non-trainable params: 1,236 (4.83 KB)
+
+[4/6] Training autoencoder …
+Epoch 1/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 3s 5ms/step - loss: 0.0500 - val_loss: 0.0168 - learning_rate: 0.0010
+Epoch 2/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 0s 4ms/step - loss: 0.0020 - val_loss: 0.0101 - learning_rate: 0.0010
+Epoch 3/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 0s 4ms/step - loss: 0.0015 - val_loss: 0.0061 - learning_rate: 0.0010
+Epoch 4/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 0s 3ms/step - loss: 0.0013 - val_loss: 0.0032 - learning_rate: 0.0010
+Epoch 5/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 0s 4ms/step - loss: 0.0012 - val_loss: 0.0015 - learning_rate: 0.0010
+Epoch 6/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 0s 4ms/step - loss: 0.0011 - val_loss: 0.0010 - learning_rate: 0.0010
+Epoch 7/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 0s 4ms/step - loss: 0.0010 - val_loss: 9.1761e-04 - learning_rate: 0.0010
+Epoch 8/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 0s 4ms/step - loss: 9.5621e-04 - val_loss: 8.6962e-04 - learning_rate: 0.0010
+Epoch 9/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 0s 4ms/step - loss: 9.0857e-04 - val_loss: 8.2616e-04 - learning_rate: 0.0010
+Epoch 10/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 0s 4ms/step - loss: 8.6537e-04 - val_loss: 7.8407e-04 - learning_rate: 0.0010
+Epoch 11/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 0s 4ms/step - loss: 8.2483e-04 - val_loss: 7.4475e-04 - learning_rate: 0.0010
+Epoch 12/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 0s 4ms/step - loss: 7.8578e-04 - val_loss: 7.0092e-04 - learning_rate: 0.0010
+Epoch 13/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 0s 4ms/step - loss: 7.4784e-04 - val_loss: 6.6047e-04 - learning_rate: 0.0010
+Epoch 14/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 0s 3ms/step - loss: 7.1307e-04 - val_loss: 6.2699e-04 - learning_rate: 0.0010
+Epoch 15/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 0s 4ms/step - loss: 6.8037e-04 - val_loss: 5.9782e-04 - learning_rate: 0.0010
+Epoch 16/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 0s 4ms/step - loss: 6.4902e-04 - val_loss: 5.7102e-04 - learning_rate: 0.0010
+Epoch 17/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 0s 4ms/step - loss: 6.2006e-04 - val_loss: 5.4620e-04 - learning_rate: 0.0010
+Epoch 18/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 0s 3ms/step - loss: 5.9151e-04 - val_loss: 5.2558e-04 - learning_rate: 0.0010
+Epoch 19/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 0s 4ms/step - loss: 5.6320e-04 - val_loss: 5.0863e-04 - learning_rate: 0.0010
+Epoch 20/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 0s 4ms/step - loss: 5.3869e-04 - val_loss: 4.9274e-04 - learning_rate: 0.0010
+Epoch 21/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 0s 4ms/step - loss: 5.1548e-04 - val_loss: 4.7624e-04 - learning_rate: 0.0010
+Epoch 22/100
+100/104 ━━━━━━━━━━━━━━━━━━━━ 0s 3ms/step - loss: 5.3326e-04 
+Epoch 22: ReduceLROnPlateau reducing learning rate to 0.0005000000237487257.
+104/104 ━━━━━━━━━━━━━━━━━━━━ 0s 4ms/step - loss: 4.9413e-04 - val_loss: 4.6429e-04 - learning_rate: 0.0010
+Epoch 23/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 1s 5ms/step - loss: 4.3260e-04 - val_loss: 4.0035e-04 - learning_rate: 5.0000e-04
+Epoch 24/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 0s 4ms/step - loss: 4.2107e-04 - val_loss: 3.9025e-04 - learning_rate: 5.0000e-04
+Epoch 25/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 0s 4ms/step - loss: 4.1251e-04 - val_loss: 3.8076e-04 - learning_rate: 5.0000e-04
+Epoch 26/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 0s 4ms/step - loss: 4.0422e-04 - val_loss: 3.7525e-04 - learning_rate: 5.0000e-04
+Epoch 27/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 0s 4ms/step - loss: 3.9621e-04 - val_loss: 3.6704e-04 - learning_rate: 5.0000e-04
+Epoch 28/100
+ 91/104 ━━━━━━━━━━━━━━━━━━━━ 0s 3ms/step - loss: 4.1682e-04 
+Epoch 28: ReduceLROnPlateau reducing learning rate to 0.0002500000118743628.
+104/104 ━━━━━━━━━━━━━━━━━━━━ 0s 4ms/step - loss: 3.8829e-04 - val_loss: 3.6038e-04 - learning_rate: 5.0000e-04
+Epoch 29/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 0s 4ms/step - loss: 3.6506e-04 - val_loss: 3.4170e-04 - learning_rate: 2.5000e-04
+Epoch 30/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 0s 4ms/step - loss: 3.6064e-04 - val_loss: 3.3835e-04 - learning_rate: 2.5000e-04
+Epoch 31/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 0s 4ms/step - loss: 3.5688e-04 - val_loss: 3.3546e-04 - learning_rate: 2.5000e-04
+Epoch 32/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 0s 4ms/step - loss: 3.5305e-04 - val_loss: 3.3328e-04 - learning_rate: 2.5000e-04
+Epoch 33/100
+ 87/104 ━━━━━━━━━━━━━━━━━━━━ 0s 3ms/step - loss: 3.7640e-04 
+Epoch 33: ReduceLROnPlateau reducing learning rate to 0.0001250000059371814.
+104/104 ━━━━━━━━━━━━━━━━━━━━ 0s 3ms/step - loss: 3.4910e-04 - val_loss: 3.3032e-04 - learning_rate: 2.5000e-04
+Epoch 34/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 0s 4ms/step - loss: 3.3207e-04 - val_loss: 3.0638e-04 - learning_rate: 1.2500e-04
+Epoch 35/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 0s 4ms/step - loss: 3.2897e-04 - val_loss: 3.0495e-04 - learning_rate: 1.2500e-04
+Epoch 36/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 0s 5ms/step - loss: 3.2714e-04 - val_loss: 3.0373e-04 - learning_rate: 1.2500e-04
+Epoch 37/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 0s 4ms/step - loss: 3.2528e-04 - val_loss: 3.0283e-04 - learning_rate: 1.2500e-04
+Epoch 38/100
+ 91/104 ━━━━━━━━━━━━━━━━━━━━ 0s 3ms/step - loss: 3.4755e-04 
+Epoch 38: ReduceLROnPlateau reducing learning rate to 6.25000029685907e-05.
+104/104 ━━━━━━━━━━━━━━━━━━━━ 0s 3ms/step - loss: 3.2338e-04 - val_loss: 3.0124e-04 - learning_rate: 1.2500e-04
+Epoch 39/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 0s 4ms/step - loss: 3.1378e-04 - val_loss: 2.8983e-04 - learning_rate: 6.2500e-05
+Epoch 40/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 0s 4ms/step - loss: 3.1217e-04 - val_loss: 2.8910e-04 - learning_rate: 6.2500e-05
+Epoch 41/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 0s 4ms/step - loss: 3.1116e-04 - val_loss: 2.8795e-04 - learning_rate: 6.2500e-05
+Epoch 42/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 0s 4ms/step - loss: 3.1012e-04 - val_loss: 2.8727e-04 - learning_rate: 6.2500e-05
+Epoch 43/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 0s 4ms/step - loss: 3.0904e-04 - val_loss: 2.8614e-04 - learning_rate: 6.2500e-05
+Epoch 44/100
+ 95/104 ━━━━━━━━━━━━━━━━━━━━ 0s 3ms/step - loss: 3.3063e-04 
+Epoch 44: ReduceLROnPlateau reducing learning rate to 3.125000148429535e-05.
+104/104 ━━━━━━━━━━━━━━━━━━━━ 0s 4ms/step - loss: 3.0792e-04 - val_loss: 2.8530e-04 - learning_rate: 6.2500e-05
+Epoch 45/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 0s 4ms/step - loss: 3.0270e-04 - val_loss: 2.8017e-04 - learning_rate: 3.1250e-05
+Epoch 46/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 0s 4ms/step - loss: 3.0162e-04 - val_loss: 2.7958e-04 - learning_rate: 3.1250e-05
+Epoch 47/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 0s 4ms/step - loss: 3.0102e-04 - val_loss: 2.7915e-04 - learning_rate: 3.1250e-05
+Epoch 48/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 1s 5ms/step - loss: 3.0041e-04 - val_loss: 2.7852e-04 - learning_rate: 3.1250e-05
+Epoch 49/100
+ 92/104 ━━━━━━━━━━━━━━━━━━━━ 0s 4ms/step - loss: 3.2238e-04 
+Epoch 49: ReduceLROnPlateau reducing learning rate to 1.5625000742147677e-05.
+104/104 ━━━━━━━━━━━━━━━━━━━━ 0s 4ms/step - loss: 2.9978e-04 - val_loss: 2.7809e-04 - learning_rate: 3.1250e-05
+Epoch 50/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 0s 4ms/step - loss: 2.9683e-04 - val_loss: 2.7514e-04 - learning_rate: 1.5625e-05
+Epoch 51/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 0s 5ms/step - loss: 2.9608e-04 - val_loss: 2.7478e-04 - learning_rate: 1.5625e-05
+Epoch 52/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 0s 4ms/step - loss: 2.9573e-04 - val_loss: 2.7446e-04 - learning_rate: 1.5625e-05
+Epoch 53/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 1s 7ms/step - loss: 2.9538e-04 - val_loss: 2.7416e-04 - learning_rate: 1.5625e-05
+Epoch 54/100
+100/104 ━━━━━━━━━━━━━━━━━━━━ 0s 4ms/step - loss: 3.1519e-04 
+Epoch 54: ReduceLROnPlateau reducing learning rate to 7.812500371073838e-06.
+104/104 ━━━━━━━━━━━━━━━━━━━━ 0s 5ms/step - loss: 2.9501e-04 - val_loss: 2.7381e-04 - learning_rate: 1.5625e-05
+Epoch 55/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 0s 4ms/step - loss: 2.9336e-04 - val_loss: 2.7207e-04 - learning_rate: 7.8125e-06
+Epoch 56/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 0s 3ms/step - loss: 2.9290e-04 - val_loss: 2.7193e-04 - learning_rate: 7.8125e-06
+Epoch 57/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 0s 4ms/step - loss: 2.9269e-04 - val_loss: 2.7173e-04 - learning_rate: 7.8125e-06
+Epoch 58/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 0s 5ms/step - loss: 2.9249e-04 - val_loss: 2.7153e-04 - learning_rate: 7.8125e-06
+Epoch 59/100
+ 96/104 ━━━━━━━━━━━━━━━━━━━━ 0s 5ms/step - loss: 3.1287e-04 
+Epoch 59: ReduceLROnPlateau reducing learning rate to 3.906250185536919e-06.
+104/104 ━━━━━━━━━━━━━━━━━━━━ 1s 6ms/step - loss: 2.9228e-04 - val_loss: 2.7138e-04 - learning_rate: 7.8125e-06
+Epoch 60/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 1s 5ms/step - loss: 2.9135e-04 - val_loss: 2.7053e-04 - learning_rate: 3.9063e-06
+Epoch 61/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 0s 4ms/step - loss: 2.9107e-04 - val_loss: 2.7039e-04 - learning_rate: 3.9063e-06
+Epoch 62/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 1s 5ms/step - loss: 2.9094e-04 - val_loss: 2.7026e-04 - learning_rate: 3.9063e-06
+Epoch 63/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 1s 5ms/step - loss: 2.9082e-04 - val_loss: 2.7014e-04 - learning_rate: 3.9063e-06
+Epoch 64/100
+ 99/104 ━━━━━━━━━━━━━━━━━━━━ 0s 6ms/step - loss: 3.1044e-04 
+Epoch 64: ReduceLROnPlateau reducing learning rate to 1.9531250927684596e-06.
+104/104 ━━━━━━━━━━━━━━━━━━━━ 1s 7ms/step - loss: 2.9070e-04 - val_loss: 2.7005e-04 - learning_rate: 3.9063e-06
+Epoch 65/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 1s 5ms/step - loss: 2.9016e-04 - val_loss: 2.6986e-04 - learning_rate: 1.9531e-06
+Epoch 66/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 0s 4ms/step - loss: 2.9000e-04 - val_loss: 2.6978e-04 - learning_rate: 1.9531e-06
+Epoch 67/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 1s 5ms/step - loss: 2.8993e-04 - val_loss: 2.6971e-04 - learning_rate: 1.9531e-06
+Epoch 68/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 1s 5ms/step - loss: 2.8986e-04 - val_loss: 2.6966e-04 - learning_rate: 1.9531e-06
+Epoch 69/100
+103/104 ━━━━━━━━━━━━━━━━━━━━ 0s 5ms/step - loss: 3.0867e-04 
+Epoch 69: ReduceLROnPlateau reducing learning rate to 1e-06.
+104/104 ━━━━━━━━━━━━━━━━━━━━ 1s 6ms/step - loss: 2.8979e-04 - val_loss: 2.6958e-04 - learning_rate: 1.9531e-06
+Epoch 70/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 1s 6ms/step - loss: 2.8947e-04 - val_loss: 2.6956e-04 - learning_rate: 1.0000e-06
+Epoch 71/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 1s 6ms/step - loss: 2.8941e-04 - val_loss: 2.6953e-04 - learning_rate: 1.0000e-06
+Epoch 72/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 0s 4ms/step - loss: 2.8936e-04 - val_loss: 2.6949e-04 - learning_rate: 1.0000e-06
+Epoch 73/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 1s 5ms/step - loss: 2.8932e-04 - val_loss: 2.6946e-04 - learning_rate: 1.0000e-06
+Epoch 74/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 1s 7ms/step - loss: 2.8928e-04 - val_loss: 2.6942e-04 - learning_rate: 1.0000e-06
+Epoch 75/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 1s 6ms/step - loss: 2.8924e-04 - val_loss: 2.6938e-04 - learning_rate: 1.0000e-06
+Epoch 76/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 1s 7ms/step - loss: 2.8920e-04 - val_loss: 2.6934e-04 - learning_rate: 1.0000e-06
+Epoch 77/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 0s 5ms/step - loss: 2.8916e-04 - val_loss: 2.6929e-04 - learning_rate: 1.0000e-06
+Epoch 78/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 0s 5ms/step - loss: 2.8912e-04 - val_loss: 2.6927e-04 - learning_rate: 1.0000e-06
+Epoch 79/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 1s 5ms/step - loss: 2.8908e-04 - val_loss: 2.6921e-04 - learning_rate: 1.0000e-06
+Epoch 80/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 1s 5ms/step - loss: 2.8903e-04 - val_loss: 2.6918e-04 - learning_rate: 1.0000e-06
+Epoch 81/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 0s 4ms/step - loss: 2.8899e-04 - val_loss: 2.6915e-04 - learning_rate: 1.0000e-06
+Epoch 82/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 1s 5ms/step - loss: 2.8894e-04 - val_loss: 2.6910e-04 - learning_rate: 1.0000e-06
+Epoch 83/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 0s 5ms/step - loss: 2.8890e-04 - val_loss: 2.6905e-04 - learning_rate: 1.0000e-06
+Epoch 84/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 0s 4ms/step - loss: 2.8885e-04 - val_loss: 2.6900e-04 - learning_rate: 1.0000e-06
+Epoch 85/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 0s 4ms/step - loss: 2.8880e-04 - val_loss: 2.6896e-04 - learning_rate: 1.0000e-06
+Epoch 86/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 0s 4ms/step - loss: 2.8876e-04 - val_loss: 2.6893e-04 - learning_rate: 1.0000e-06
+Epoch 87/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 0s 4ms/step - loss: 2.8871e-04 - val_loss: 2.6887e-04 - learning_rate: 1.0000e-06
+Epoch 88/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 1s 5ms/step - loss: 2.8866e-04 - val_loss: 2.6882e-04 - learning_rate: 1.0000e-06
+Epoch 89/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 0s 5ms/step - loss: 2.8861e-04 - val_loss: 2.6878e-04 - learning_rate: 1.0000e-06
+Epoch 90/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 1s 5ms/step - loss: 2.8856e-04 - val_loss: 2.6874e-04 - learning_rate: 1.0000e-06
+Epoch 91/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 0s 4ms/step - loss: 2.8851e-04 - val_loss: 2.6869e-04 - learning_rate: 1.0000e-06
+Epoch 92/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 0s 4ms/step - loss: 2.8846e-04 - val_loss: 2.6863e-04 - learning_rate: 1.0000e-06
+Epoch 93/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 0s 4ms/step - loss: 2.8841e-04 - val_loss: 2.6858e-04 - learning_rate: 1.0000e-06
+Epoch 94/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 0s 4ms/step - loss: 2.8836e-04 - val_loss: 2.6855e-04 - learning_rate: 1.0000e-06
+Epoch 95/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 0s 4ms/step - loss: 2.8831e-04 - val_loss: 2.6849e-04 - learning_rate: 1.0000e-06
+Epoch 96/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 1s 6ms/step - loss: 2.8825e-04 - val_loss: 2.6844e-04 - learning_rate: 1.0000e-06
+Epoch 97/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 1s 7ms/step - loss: 2.8820e-04 - val_loss: 2.6838e-04 - learning_rate: 1.0000e-06
+Epoch 98/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 1s 6ms/step - loss: 2.8815e-04 - val_loss: 2.6834e-04 - learning_rate: 1.0000e-06
+Epoch 99/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 1s 5ms/step - loss: 2.8810e-04 - val_loss: 2.6828e-04 - learning_rate: 1.0000e-06
+Epoch 100/100
+104/104 ━━━━━━━━━━━━━━━━━━━━ 0s 4ms/step - loss: 2.8804e-04 - val_loss: 2.6822e-04 - learning_rate: 1.0000e-06
+Restoring model weights from the end of the best epoch: 100.
+
+[5/6] Computing anomaly threshold …
+
+  Validation MSE  –  mean: 0.000268  std: 0.002198
+  Anomaly threshold       : 0.002466
+
+[6/6] Evaluating on test set …
+
+============================================================
+  CLASSIFICATION  REPORT
+============================================================
+              precision    recall  f1-score   support
+
+      Benign     1.0000    0.9837    0.9918     16516
+      Attack     0.9997    1.0000    0.9999    968750
+
+    accuracy                         0.9997    985266
+   macro avg     0.9999    0.9918    0.9958    985266
+weighted avg     0.9997    0.9997    0.9997    985266
+
+  Accuracy : 0.9997
+
+  Confusion matrix (rows=actual, cols=predicted):
+[[ 16246    270]
+ [     0 968750]]
+
+
+  Generating plots …
+  Saved training-loss plot → results/training_loss.png
+  Saved histogram plot    → results/error_histogram.png
+
+  Total execution time: 91.2 s  (1.52 min)
+  Done.
