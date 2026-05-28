@@ -154,6 +154,14 @@ flowchart TD
 | Isolation Forest| Классический метод обнаружения аномалий без нейросетей |
 | One-Class SVM | Другой принцип (граница в пространстве признаков) — третья точка сравнения |
 
+Isolation Forest
+<img width="800" height="377" alt="image" src="https://github.com/user-attachments/assets/09afb87f-e6ca-41f8-8bbd-ac8d8c80c462" />
+
+
+One-Class SVM
+<img width="640" height="480" alt="image" src="https://github.com/user-attachments/assets/02d7c4de-27cd-4d45-94a3-a0d74074ae5e" />
+
+
 ## Структура репозитория
  
 ```
@@ -253,5 +261,5 @@ chmod +x run_all_manual.sh
 1. LLM-автоэнкодер значительно превосходит Isolation Forest на всех устройствах
 2. Device 3 (Ennio Doorbell) и Device 9 (SimpleHome 1003) — проблемные для всех методов (Accuracy ~0.37–0.76)
 3. Claude проседает на devices 5–6 (камеры Provision, Accuracy ~0.73), DeepSeek и GigaChat держат 0.999+
-4. Язык промпта: минимальное влияние на метрики, но DeepSeek RU содержал 2 бага в коде
+4. Язык промпта: минимальное влияние на метрики, но DeepSeek RU содержал 2 бага в коде: некорректное чтение CSV и несуществующая переменная history в возврате функции.
 5. GigaChat RU: подозрительно идеальные результаты (1.00 везде) — вероятна утечка данных
