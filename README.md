@@ -147,12 +147,11 @@ flowchart TD
 
 ## Бейзлайн «руками» (???)
  
-Для сравнения с LLM-генерированным кодом реализованы три метода вручную:
+Для сравнения с LLM-генерированным кодом реализованы два метода вручную:
  
 | Метод | Зачем |
 |---|---|
-| Автоэнкодер (Dropout + ReLU + StandardScaler) | Та же идея, но другие архитектурные решения — показывает, насколько выбор LLM (BatchNorm, LeakyReLU, MinMaxScaler) влияет на результат |
-| Isolation Forest| Классический метод обнаружения аномалий без нейросетей — нужен ли вообще автоэнкодер? |
+| Isolation Forest| Классический метод обнаружения аномалий без нейросетей |
 | One-Class SVM | Другой принцип (граница в пространстве признаков) — третья точка сравнения |
 
 ## Структура репозитория
@@ -205,6 +204,19 @@ python3 claude_en.py --data_dir ../dataset --device_id 1 2>&1 | tee ../results/d
 ```bash
 chmod +x run_all.sh
 ./run_all.sh
+```
+
+5. Запуск ручного бейзлайна (Isolation Forest + One-Class SVM) (только на устройстве 1 -- пример)
+
+```bash
+python3 baseline/botnet_detection_manual.py --data_dir dataset --device_id 1 2>&1 | tee results/device_1_danmini_doorbell/manual_baseline.txt
+```
+
+6. Запуск ручного бейзлайна на всех 9 устройствах
+
+```bash
+chmod +x run_all_manual.sh
+./run_all_manual.sh
 ```
 
 
