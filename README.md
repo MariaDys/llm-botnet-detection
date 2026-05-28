@@ -145,7 +145,7 @@ flowchart TD
  
 Каждая модель получила оба промпта (EN и RU) в отдельных чатах → 6 скриптов.
 
-## Бейзлайн «руками» (???)
+## Бейзлайн «руками»
  
 Для сравнения с LLM-генерированным кодом реализованы два метода вручную:
  
@@ -153,14 +153,6 @@ flowchart TD
 |---|---|
 | Isolation Forest| Классический метод обнаружения аномалий без нейросетей |
 | One-Class SVM | Другой принцип (граница в пространстве признаков) — третья точка сравнения |
-
-Isolation Forest
-<img width="800" height="377" alt="image" src="https://github.com/user-attachments/assets/09afb87f-e6ca-41f8-8bbd-ac8d8c80c462" />
-
-
-One-Class SVM
-<img width="640" height="480" alt="image" src="https://github.com/user-attachments/assets/02d7c4de-27cd-4d45-94a3-a0d74074ae5e" />
-
 
 ## Структура репозитория
  
