@@ -1,0 +1,51 @@
+[Parallel(n_jobs=8)]: Using backend ThreadingBackend with 8 concurrent workers.
+[Parallel(n_jobs=8)]: Done   2 out of   8 | elapsed:    0.1s remaining:    0.3s
+[Parallel(n_jobs=8)]: Done   8 out of   8 | elapsed:    0.1s finished
+[Parallel(n_jobs=1)]: Done  49 tasks      | elapsed:    0.0s
+[Parallel(n_jobs=1)]: Done 199 tasks      | elapsed:    0.1s
+[Parallel(n_jobs=1)]: Done 200 out of 200 | elapsed:    0.1s finished
+[Parallel(n_jobs=1)]: Done  49 tasks      | elapsed:    0.2s
+[Parallel(n_jobs=1)]: Done 199 tasks      | elapsed:    0.8s
+[Parallel(n_jobs=1)]: Done 200 out of 200 | elapsed:    0.8s finished
+Loading data for device 3...
+  Benign: 39,100  |  Attack: 316,400
+
+==================================================
+METHOD 2: ISOLATION FOREST
+==================================================
+              precision    recall  f1-score   support
+
+      Benign       0.04      0.99      0.08     13034
+      Attack       0.68      0.00      0.00    316400
+
+    accuracy                           0.04    329434
+   macro avg       0.36      0.50      0.04    329434
+weighted avg       0.66      0.04      0.00    329434
+
+Accuracy: 0.0401
+
+==================================================
+METHOD 3: ONE-CLASS SVM
+==================================================
+  Training on 10,000 samples, testing on 20,000 samples
+              precision    recall  f1-score   support
+
+      Benign       1.00      0.98      0.99       780
+      Attack       1.00      1.00      1.00     19220
+
+    accuracy                           1.00     20000
+   macro avg       1.00      0.99      1.00     20000
+weighted avg       1.00      1.00      1.00     20000
+
+Accuracy: 0.9993
+
+============================================================
+COMPARISON SUMMARY
+============================================================
+  Method                                Accuracy
+  ----------------------------------- ----------
+  Isolation Forest                        0.0401
+  One-Class SVM (subsampled)              0.9993
+============================================================
+
+Total execution time: 0.06 minutes

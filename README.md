@@ -1,4 +1,4 @@
-# LLM-BotNet-detection
+# LLM BotNet Detection
 Обнаружение ботнет-атак в IoT-трафике с помощью LLM-генерируемого кода
 
 ## Цель и задачи 
@@ -56,6 +56,12 @@
 | 8.84 | 360 | 21200 | 10.9 | 360 | ... |
 
 </details>
+
+**Разметка (Ground Truth)**
+
+Есть benign-файлы и attck-файлы.
+- Все записи из benign-файла `*.benign.csv` -- нормальное поведение. У файла метка **0** (нормальный трафик)
+- Все записи из attack-файла `*.gafgyt.*.csv` или `*.mirai.*.csv` -- аномальное поведение. У файла метка **1** (атака)
 
 **Как обнаруживается атака**
 
@@ -141,12 +147,11 @@ flowchart TD
 
 ## Бейзлайн «руками» (???)
  
-Для сравнения с LLM-генерированным кодом реализованы три метода вручную:
+Для сравнения с LLM-генерированным кодом реализованы два метода вручную:
  
 | Метод | Зачем |
 |---|---|
-| Автоэнкодер (Dropout + ReLU + StandardScaler) | Та же идея, но другие архитектурные решения — показывает, насколько выбор LLM (BatchNorm, LeakyReLU, MinMaxScaler) влияет на результат |
-| Isolation Forest| Классический метод обнаружения аномалий без нейросетей — нужен ли вообще автоэнкодер? |
+| Isolation Forest| Классический метод обнаружения аномалий без нейросетей |
 | One-Class SVM | Другой принцип (граница в пространстве признаков) — третья точка сравнения |
 
 ## Структура репозитория
@@ -165,40 +170,54 @@ flowchart TD
 │   ├── gigachat_en.py                # GigaChat + EN промпт
 │   └── gigachat_ru.py                # GigaChat + RU промпт
 ├── baseline/
-│   └── botnet_detection_manual.py    # Ручной бейзлайн (AE + IsoForest + OC-SVM)
+│   └── botnet_detection_manual.py    # Ручной бейзлайн (IsoForest + OC-SVM)
 ├── results/
-│   ├── device_1_danmini_doorbell/    # Результаты по устройству 1
+│   ├── device_1_danmini_doorbell/    # Результаты по устройству 1: llm.txt и manual_baseline.txt
 │   ├── device_2_ecobee_thermostat/
 │   ├── ...
 │   └── device_9_simplehome_1003/
 ├── run_all.sh                        # Скрипт для прогона всех экспериментов (9 устройств)
+├── run_all_manual.sh                 # Прогон бейзлайна × 9 устройств
 ├── requirements.txt
 ├── presentation/                     # Слайды (LaTeX)
 └── diagram1.png, diagram2.png        # Схемы эксперимента
 ```
 
 ## Как запустить
-### 1. Установка зависимостей
+1. Установка зависимостей
  
 ```bash
 pip3 install -r requirements.txt
 ```
 
-### 2. Скачивание датасета
+2. Скачивание датасета
 Скачать CSV-файлы с [Kaggle](https://www.kaggle.com/datasets/mkashifn/nbaiot-dataset) и распаковать в папку `dataset/`.
  
-### 3. Запуск одного скрипта (только на устройстве 1 -- пример)
+3. Запуск одного скрипта (только на устройстве 1 -- пример)
  
 ```bash
 cd generated_code
 python3 claude_en.py --data_dir ../dataset --device_id 1 2>&1 | tee ../results/device_1_danmini_doorbell/claude_en.txt
 ```
 
-### 4. Запуск всех экспериментов (все 6 скриптов × 9 устройств)
+4. Запуск всех экспериментов (все 6 скриптов × 9 устройств)
  
 ```bash
 chmod +x run_all.sh
 ./run_all.sh
+```
+
+5. Запуск ручного бейзлайна (Isolation Forest + One-Class SVM) (только на устройстве 1 -- пример)
+
+```bash
+python3 baseline/botnet_detection_manual.py --data_dir dataset --device_id 1 2>&1 | tee results/device_1_danmini_doorbell/manual_baseline.txt
+```
+
+6. Запуск ручного бейзлайна на всех 9 устройствах
+
+```bash
+chmod +x run_all_manual.sh
+./run_all_manual.sh
 ```
 
 

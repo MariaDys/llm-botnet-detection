@@ -1,0 +1,54 @@
+[Parallel(n_jobs=8)]: Using backend ThreadingBackend with 8 concurrent workers.
+[Parallel(n_jobs=8)]: Done   2 out of   8 | elapsed:    0.3s remaining:    0.9s
+[Parallel(n_jobs=8)]: Done   8 out of   8 | elapsed:    0.3s finished
+[Parallel(n_jobs=1)]: Done  49 tasks      | elapsed:    0.0s
+[Parallel(n_jobs=1)]: Done 199 tasks      | elapsed:    0.1s
+[Parallel(n_jobs=1)]: Done 200 out of 200 | elapsed:    0.1s finished
+[Parallel(n_jobs=1)]: Done  49 tasks      | elapsed:    0.4s
+[Parallel(n_jobs=1)]: Done 199 tasks      | elapsed:    1.6s
+[Parallel(n_jobs=1)]: Done 200 out of 200 | elapsed:    1.6s finished
+[Parallel(n_jobs=1)]: Done  49 tasks      | elapsed:    0.2s
+[Parallel(n_jobs=1)]: Done 199 tasks      | elapsed:    0.6s
+[Parallel(n_jobs=1)]: Done 200 out of 200 | elapsed:    0.6s finished
+Loading data for device 8...
+  Benign: 46,585  |  Attack: 816,471
+
+==================================================
+METHOD 2: ISOLATION FOREST
+==================================================
+              precision    recall  f1-score   support
+
+      Benign       0.03      0.99      0.06     15529
+      Attack       1.00      0.42      0.59    816471
+
+    accuracy                           0.43    832000
+   macro avg       0.52      0.70      0.32    832000
+weighted avg       0.98      0.43      0.58    832000
+
+Accuracy: 0.4260
+
+==================================================
+METHOD 3: ONE-CLASS SVM
+==================================================
+  Training on 10,000 samples, testing on 20,000 samples
+              precision    recall  f1-score   support
+
+      Benign       0.99      0.99      0.99       362
+      Attack       1.00      1.00      1.00     19638
+
+    accuracy                           1.00     20000
+   macro avg       1.00      0.99      1.00     20000
+weighted avg       1.00      1.00      1.00     20000
+
+Accuracy: 0.9997
+
+============================================================
+COMPARISON SUMMARY
+============================================================
+  Method                                Accuracy
+  ----------------------------------- ----------
+  Isolation Forest                        0.4260
+  One-Class SVM (subsampled)              0.9997
+============================================================
+
+Total execution time: 0.18 minutes
