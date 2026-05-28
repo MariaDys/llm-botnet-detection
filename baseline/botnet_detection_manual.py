@@ -1,17 +1,13 @@
 """
-Botnet Detection on N-BaIoT — MANUALLY CODED BASELINE
-======================================================
-This script is written "by hand" (without LLM prompting) to serve as
-a comparison baseline for the LLM-generated autoencoder solution.
+Botnet Detection: ручные модели
 
-It implements THREE different approaches:
-  1. Deep Autoencoder (similar architecture, slight differences)
-  2. Isolation Forest (classical anomaly detection)
-  3. One-Class SVM (classical anomaly detection)
+  1. Deep Autoencoder
+  2. Isolation Forest
+  3. One-Class SVM
 
-This allows comparing:
-  - LLM-generated autoencoder vs manually-coded autoencoder
-  - Deep learning (autoencoder) vs classical ML (IsoForest, OC-SVM)
+Сравнение:
+  - LLM автоэнкодер vs ручной автоэнкодер
+  - Deep learning (автоэнкодер) vs классический ML (IsoForest, OC-SVM)
 """
 
 import os
@@ -28,23 +24,22 @@ from sklearn.preprocessing import StandardScaler  # NOTE: StandardScaler, not Mi
 from sklearn.metrics import classification_report, confusion_matrix, accuracy_score
 from sklearn.ensemble import IsolationForest
 from sklearn.svm import OneClassSVM
-
-import tensorflow as tf
-from tensorflow.keras.layers import Input, Dense, Dropout
-from tensorflow.keras.models import Model
-from tensorflow.keras.callbacks import EarlyStopping
-from tensorflow.keras.optimizers import Adam
+import argparse
 
 
-# ========================== CONFIGURATION ==========================
-DATA_DIR = "dataset"
-DEVICE_ID = 1
-RANDOM_SEED = 42
-# ===================================================================
+# запуск через чтение аргументов командной строки: python3 baseline/botnet_detection_manual.py --data_dir ДАТАСЕТ --device_id НОМЕР_УСТРОЙСТВА
+parser = argparse.ArgumentParser()
+parser.add_argument("--data_dir", type=str, default="dataset")
+parser.add_argument("--device_id", type=int, default=1)
+parser.add_argument("--seed", type=int, default=42)
+args = parser.parse_args()
+DATA_DIR = args.data_dir
+DEVICE_ID = args.device_id
+RANDOM_SEED = args.seed
 
 
+# загрузка benign и attack данных из датасета для конкретного устройства
 def load_device_data(data_dir, device_id):
-    """Load benign and attack data for a device."""
     print(f"Loading data for device {device_id}...")
 
     benign_path = os.path.join(data_dir, f"{device_id}.benign.csv")
@@ -66,8 +61,8 @@ def load_device_data(data_dir, device_id):
     return benign, attacks
 
 
+# разделение данных на train (только benign) и test (benign + attacks)
 def prepare_splits(benign, attacks):
-    """Split data into train (benign only) / test (benign + attacks)."""
     benign_vals = benign.values
     np.random.seed(RANDOM_SEED)
     perm = np.random.permutation(len(benign_vals))
@@ -82,7 +77,6 @@ def prepare_splits(benign, attacks):
 
     X_train, X_val = train_test_split(X_train_all, test_size=0.2, random_state=RANDOM_SEED)
 
-    # Use StandardScaler (difference from LLM version which uses MinMaxScaler)
     scaler = StandardScaler()
     X_train = scaler.fit_transform(X_train)
     X_val = scaler.transform(X_val)
@@ -95,90 +89,15 @@ def prepare_splits(benign, attacks):
     return X_train, X_val, X_test, y_test
 
 
-# ===================== METHOD 1: AUTOENCODER =====================
+# ============== метод 1: ISOLATION FOREST ==============
 
-def build_manual_autoencoder(n_features):
-    """
-    Manually coded autoencoder — differs from the LLM version:
-      - Uses Dropout instead of BatchNormalization
-      - Uses 'relu' instead of LeakyReLU
-      - Different layer sizes (powers of 2)
-      - Uses StandardScaler instead of MinMaxScaler
-    """
-    inp = Input(shape=(n_features,))
-
-    # Encoder with Dropout (different from LLM's BatchNorm + LeakyReLU)
-    e = Dense(128, activation='relu')(inp)
-    e = Dropout(0.2)(e)
-    e = Dense(64, activation='relu')(e)
-    e = Dropout(0.2)(e)
-    e = Dense(32, activation='relu')(e)
-
-    # Bottleneck
-    bottleneck = Dense(16, activation='relu')(e)
-
-    # Decoder
-    d = Dense(32, activation='relu')(bottleneck)
-    d = Dropout(0.2)(d)
-    d = Dense(64, activation='relu')(d)
-    d = Dropout(0.2)(d)
-    d = Dense(128, activation='relu')(d)
-
-    output = Dense(n_features, activation='linear')(d)
-
-    model = Model(inp, output)
-    model.compile(optimizer=Adam(learning_rate=0.001), loss='mse')
-    return model
-
-
-def run_autoencoder(X_train, X_val, X_test, y_test):
-    """Train autoencoder and evaluate."""
-    print("\n" + "=" * 50)
-    print("METHOD 1: MANUAL AUTOENCODER (Dropout + ReLU)")
-    print("=" * 50)
-
-    model = build_manual_autoencoder(X_train.shape[1])
-    model.summary()
-
-    history = model.fit(
-        X_train, X_train,
-        epochs=200,
-        batch_size=64,
-        validation_data=(X_val, X_val),
-        callbacks=[EarlyStopping(monitor='val_loss', patience=15, restore_best_weights=True)],
-        verbose=1
-    )
-
-    # Threshold from validation
-    val_pred = model.predict(X_val, verbose=0)
-    val_mse = np.mean((X_val - val_pred) ** 2, axis=1)
-    threshold = val_mse.mean() + val_mse.std()
-    print(f"  Threshold: {threshold:.6f}")
-
-    # Test
-    test_pred = model.predict(X_test, verbose=0)
-    test_mse = np.mean((X_test - test_pred) ** 2, axis=1)
-    y_pred = (test_mse > threshold).astype(int)
-
-    print(classification_report(y_test.astype(int), y_pred,
-                                target_names=["Benign", "Attack"]))
-    print(f"Accuracy: {accuracy_score(y_test, y_pred):.4f}")
-
-    return history, accuracy_score(y_test, y_pred)
-
-
-# ============== METHOD 2: ISOLATION FOREST ==============
-
+#ml без учителя, разработан для обнаружения аномалий (выбросов) в данных, тренируется только на нормальных (не attack) данных
 def run_isolation_forest(X_train, X_test, y_test):
-    """
-    Isolation Forest — classical unsupervised anomaly detector.
-    Trained only on benign (normal) data.
-    """
+  
     print("\n" + "=" * 50)
     print("METHOD 2: ISOLATION FOREST")
     print("=" * 50)
-
-    # Subsample training data if too large (IsoForest is slow on >100k samples)
+  
     if len(X_train) > 50000:
         idx = np.random.choice(len(X_train), 50000, replace=False)
         X_fit = X_train[idx]
@@ -194,7 +113,7 @@ def run_isolation_forest(X_train, X_test, y_test):
     )
     clf.fit(X_fit)
 
-    # Predict: IsolationForest returns 1 for normal, -1 for anomaly
+    # IsolationForest возвращает 1 для normal, -1 для anomaly
     raw_pred = clf.predict(X_test)
     y_pred = np.where(raw_pred == -1, 1, 0)  # convert to 0=benign, 1=attack
 
@@ -205,18 +124,16 @@ def run_isolation_forest(X_train, X_test, y_test):
     return accuracy_score(y_test, y_pred)
 
 
-# ============== METHOD 3: ONE-CLASS SVM ==============
+# ============== метод 2: ONE-CLASS SVM ==============
 
+# One-Class SVM строит границы вокруг нормального поведения, детектирует таким ообразом отклонение. Работает медленно на больших датасетах.
 def run_ocsvm(X_train, X_test, y_test):
-    """
-    One-Class SVM — trained only on benign data.
-    NOTE: Very slow on large datasets; we subsample heavily.
-    """
+  
     print("\n" + "=" * 50)
     print("METHOD 3: ONE-CLASS SVM")
     print("=" * 50)
 
-    # OC-SVM is O(n^2)–O(n^3), so we must subsample
+    # O(n^2)–O(n^3), поэтому используем подвыборку
     max_train = 10000
     max_test = 20000
 
@@ -249,10 +166,10 @@ def run_ocsvm(X_train, X_test, y_test):
     return accuracy_score(y_test_sub, y_pred)
 
 
-# ============== COMPARISON SUMMARY ==============
+# ============== Сравнение ==============
 
+#таблица со сравнением
 def compare_results(results: dict):
-    """Print a comparison table of all methods."""
     print("\n" + "=" * 60)
     print("COMPARISON SUMMARY")
     print("=" * 60)
@@ -265,9 +182,7 @@ def compare_results(results: dict):
 
 def main():
     start = time.time()
-
     np.random.seed(RANDOM_SEED)
-    tf.random.set_seed(RANDOM_SEED)
 
     # Load data
     benign, attacks = load_device_data(DATA_DIR, DEVICE_ID)
@@ -275,19 +190,15 @@ def main():
 
     results = {}
 
-    # Method 1: Autoencoder
-    _, ae_acc = run_autoencoder(X_train, X_val, X_test, y_test)
-    results["Manual Autoencoder (Dropout+ReLU)"] = ae_acc
-
-    # Method 2: Isolation Forest
+    # 1 -- Isolation Forest
     if_acc = run_isolation_forest(X_train, X_test, y_test)
     results["Isolation Forest"] = if_acc
 
-    # Method 3: One-Class SVM (on subsampled data)
+    # 2 -- One-Class SVM
     ocsvm_acc = run_ocsvm(X_train, X_test, y_test)
     results["One-Class SVM (subsampled)"] = ocsvm_acc
 
-    # Final comparison
+    # сравнение
     compare_results(results)
 
     elapsed = time.time() - start
