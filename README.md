@@ -178,23 +178,23 @@ flowchart TD
 ```
 
 ## Как запустить
-### 1. Установка зависимостей
+1. Установка зависимостей
  
 ```bash
 pip3 install -r requirements.txt
 ```
 
-### 2. Скачивание датасета
+2. Скачивание датасета
 Скачать CSV-файлы с [Kaggle](https://www.kaggle.com/datasets/mkashifn/nbaiot-dataset) и распаковать в папку `dataset/`.
  
-### 3. Запуск одного скрипта (только на устройстве 1 -- пример)
+3. Запуск одного скрипта (только на устройстве 1 -- пример)
  
 ```bash
 cd generated_code
 python3 claude_en.py --data_dir ../dataset --device_id 1 2>&1 | tee ../results/device_1_danmini_doorbell/claude_en.txt
 ```
 
-### 4. Запуск всех экспериментов (все 6 скриптов × 9 устройств)
+4. Запуск всех экспериментов (все 6 скриптов × 9 устройств)
  
 ```bash
 chmod +x run_all.sh
