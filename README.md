@@ -43,22 +43,46 @@
  Файл `meta_propt_for_codex.md`
  
 ```mermaid
-graph LR
-    A[Методология<br>Monge Martinez 2023] --> B[Мета-промпт]
-    B --> C[Codex / GPT 5.5]
-    C --> D[Промпт EN]
-    C --> E[Промпт RU]
-    D --> F[Claude Opus 4.6]
-    D --> G[DeepSeek V4]
-    D --> H[GigaChat]
-    E --> F
-    E --> G
-    E --> H
-    F --> I[6 скриптов]
-    G --> I
-    H --> I
-    I --> J[Сравнение<br>результатов]
-    K[Бейзлайн<br>руками] --> J
+flowchart TD
+    A["<b>Методология</b><br/>Роль → Контекст → \n Данные → Шаги<br/>"]
+    B["<b>Мета-промпт для Codex</b><br/>"]
+    C["<b>Codex GPT 5.5</b><br/>Генерирует финальные промпты"]
+    D["<b>Промпт EN</b>"]
+    E["<b>Промпт RU</b>"]
+    F["<b>Claude Opus</b>"]
+    G["<b>DeepSeek</b>"]
+    H["<b>GigaChat</b>"]
+    I["Код Claude"]
+    J["Код DeepSeek"]
+    K["Код GigaChat"]
+    L["<b>Бейзлайн «руками»</b><br/>AE + IsoForest + OC-SVM"]
+    M[("<b>N-BaIoT</b><br/>9 устройств × 115 фич")]
+    N["<b>Сравнение результатов</b><br/>Accuracy, F1, Precision, Recall"]
+ 
+    A --> B --> C
+    C --> D & E
+    D & E --> F & G & H
+    F --> I
+    G --> J
+    H --> K
+    I & J & K --> N
+    L --> N
+    M --> N
+ 
+    style A fill:#F1EFE8,stroke:#5F5E5A,color:#2C2C2A
+    style B fill:#EEEDFE,stroke:#534AB7,color:#26215C
+    style C fill:#E1F5EE,stroke:#0F6E56,color:#04342C
+    style D fill:#FAECE7,stroke:#993C1D,color:#4A1B0C
+    style E fill:#FAECE7,stroke:#993C1D,color:#4A1B0C
+    style F fill:#E6F1FB,stroke:#185FA5,color:#042C53
+    style G fill:#E6F1FB,stroke:#185FA5,color:#042C53
+    style H fill:#E6F1FB,stroke:#185FA5,color:#042C53
+    style I fill:#FAEEDA,stroke:#854F0B,color:#412402
+    style J fill:#FAEEDA,stroke:#854F0B,color:#412402
+    style K fill:#FAEEDA,stroke:#854F0B,color:#412402
+    style L fill:#FBEAF0,stroke:#993556,color:#4B1528
+    style M fill:#EAF3DE,stroke:#3B6D11,color:#173404
+    style N fill:#EEEDFE,stroke:#534AB7,color:#26215C
 ```
  
 На основе методологии из Monge Martinez (2023) ["Using LLMs and GPT to streamline data analysis in cybersecurity incidents"](https://luckyluk3.medium.com/using-llms-and-gpt-to-streamline-data-analysis-in-cybersecurity-incidents-ebeb0d23e01b):
