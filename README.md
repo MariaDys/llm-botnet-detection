@@ -170,13 +170,14 @@ flowchart TD
 │   ├── gigachat_en.py                # GigaChat + EN промпт
 │   └── gigachat_ru.py                # GigaChat + RU промпт
 ├── baseline/
-│   └── botnet_detection_manual.py    # Ручной бейзлайн (AE + IsoForest + OC-SVM)
+│   └── botnet_detection_manual.py    # Ручной бейзлайн (IsoForest + OC-SVM)
 ├── results/
 │   ├── device_1_danmini_doorbell/    # Результаты по устройству 1: llm.txt и manual_baseline.txt
 │   ├── device_2_ecobee_thermostat/
 │   ├── ...
 │   └── device_9_simplehome_1003/
 ├── run_all.sh                        # Скрипт для прогона всех экспериментов (9 устройств)
+├── run_all_manual.sh                 # Прогон бейзлайна × 9 устройств
 ├── requirements.txt
 ├── presentation/                     # Слайды (LaTeX)
 └── diagram1.png, diagram2.png        # Схемы эксперимента
