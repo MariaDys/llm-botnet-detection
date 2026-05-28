@@ -1,4 +1,4 @@
-# LLM-BotNet-detection
+# LLM BotNet Detection
 Обнаружение ботнет-атак в IoT-трафике с помощью LLM-генерируемого кода
 
 ## Цель и задачи 
