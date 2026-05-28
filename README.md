@@ -172,7 +172,7 @@ flowchart TD
 ├── baseline/
 │   └── botnet_detection_manual.py    # Ручной бейзлайн (AE + IsoForest + OC-SVM)
 ├── results/
-│   ├── device_1_danmini_doorbell/    # Результаты по устройству 1
+│   ├── device_1_danmini_doorbell/    # Результаты по устройству 1: llm.txt и manual_baseline.txt
 │   ├── device_2_ecobee_thermostat/
 │   ├── ...
 │   └── device_9_simplehome_1003/
